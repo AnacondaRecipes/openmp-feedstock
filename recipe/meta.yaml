@@ -34,6 +34,7 @@ outputs:
     requirements:
       build:
         - {{ compiler('cxx') }}
+        - clang  # [win]
         - cmake
         - make  # [unix]
         - perl

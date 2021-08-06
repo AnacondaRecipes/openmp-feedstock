@@ -1,14 +1,18 @@
 mkdir build
 cd build
 
-set "CC=cl.exe"
-set "CXX=cl.exe"
+if %ARCH% == 64 (
+  set "CC=clang-cl.exe"
+  set "CXX=clang-cl.exe"
+) else (
+  set "CC=clang-cl.exe -m32"
+  set "CXX=clang-cl.exe -m32"
+)
 
 cmake -G "Ninja" ^
     -DCMAKE_BUILD_TYPE="Release" ^
     -DCMAKE_PREFIX_PATH=%LIBRARY_PREFIX% ^
     -DCMAKE_INSTALL_PREFIX:PATH=%LIBRARY_PREFIX% ^
-    -DLLVM_TEMPORARILY_ALLOW_OLD_TOOLCHAIN=ON ^
     %SRC_DIR%
 
 if errorlevel 1 exit 1
