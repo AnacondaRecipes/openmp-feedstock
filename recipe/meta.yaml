@@ -1,6 +1,6 @@
 {% set name = "openmp" %}
-{% set version = "12.0.0" %}
-{% set sha256 = "eb1b7022a247332114985ed155a8fb632c28ce7c35a476e2c0caf865150f167d" %}
+{% set version = "14.0.6" %}
+{% set sha256 = "8b3cfd7bc695bd6cea0f37f53f0981f34f87496e79e2529874fd03a2f9dd3a8a" %}
 {% set openmp_ver = "4.5" %}
 
 package:
@@ -8,14 +8,17 @@ package:
   version: {{ version }}
 
 source:
-  url: https://github.com/llvm/llvm-project/releases/download/llvmorg-{{ version.replace(".rc", "-rc") }}/openmp-{{ version.replace(".rc", "rc") }}.src.tar.xz
+  url: https://github.com/llvm/llvm-project/releases/download/llvmorg-{{ version.replace(".rc", "-rc") }}/llvm-project-{{ version.replace(".rc", "rc") }}.src.tar.xz
   sha256: {{ sha256 }}
-  # patches:
-  #  - darwin_arm64.patch
+  # name folder for easier deletion; we do the equivalent of downloading
+  # the subproject sources, so the work folder then has openmp in it;
+  # for details see build scripts
+  folder: llvm-project
 
 build:
-  number: 1
-  skip: true  # [win and vc<14]
+  number: 0
+  skip: True  # [win and vc<14]
+  skip: True  # [linux and s390x]
 
 outputs:
   - name: llvm-openmp
@@ -36,14 +39,13 @@ outputs:
         - {{ compiler('cxx') }}
         - clang  # [win]
         - cmake
-        - make  # [unix]
+        - make   # [unix]
         - perl
         - ninja  # [win]
       host:
         - llvmdev {{ version }}|{{ version }}.*
+        - zlib   # [linux]
       run_constrained:
-        - clangdev {{ version }}|{{ version }}.*
-        - llvmdev {{ version }}|{{ version }}.*
         - openmp {{ version }}|{{ version }}.*
     test:
       requires:
@@ -64,9 +66,12 @@ outputs:
         - omp_hello.c
 
 about:
-  home: http://openmp.llvm.org/
-  license: NCSA
-  license_file: LICENSE.txt
+  home: https://openmp.llvm.org/
+  license: Apache-2.0 WITH LLVM-exception
+  license_file: openmp/LICENSE.TXT
+  dev_url: https://github.com/llvm/llvm-project
+  doc_url: https://llvm.org/docs/
+  license_family: Apache
   summary: The OpenMP API supports multi-platform shared-memory parallel programming in C/C++ and Fortran.
 
 extra:
@@ -77,3 +82,4 @@ extra:
     - isuruf
     - beckermr
     - katietz
+    - h-vetinari
