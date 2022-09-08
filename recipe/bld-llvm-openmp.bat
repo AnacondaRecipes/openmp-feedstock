@@ -40,9 +40,6 @@ if not exist "%LIBRARY_PREFIX%\lib\clang\%PKG_VERSION%\include\" (
   exit 1
 )
 
-dir %LIBRARY_INC%
-dir %LIBRARY_PREFIX%
-dir %LIBRARY_PREFIX%\lib\clang\%PKG_VERSION%\include\
 :: Standalone libomp build doesn't put omp.h in clang's default search path
 cp %LIBRARY_INC%\omp.h %LIBRARY_PREFIX%\lib\clang\%PKG_VERSION%\include
-if %ERRORLEVEL% neq 0 exit 1
+exit 0
