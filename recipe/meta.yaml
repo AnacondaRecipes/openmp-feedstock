@@ -39,14 +39,13 @@ outputs:
         - {{ compiler('cxx') }}
         - clang  # [win]
         - cmake
-        - make  # [unix]
+        - make   # [unix]
         - perl
         - ninja  # [win]
       host:
         - llvmdev {{ version }}|{{ version }}.*
+        - zlib   # [linux]
       run_constrained:
-        - clangdev {{ version }}|{{ version }}.*
-        - llvmdev {{ version }}|{{ version }}.*
         - openmp {{ version }}|{{ version }}.*
     test:
       requires:
@@ -83,3 +82,4 @@ extra:
     - isuruf
     - beckermr
     - katietz
+    - h-vetinari
