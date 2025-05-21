@@ -30,16 +30,9 @@ if %ERRORLEVEL% neq 0 exit 1
 :: del /F /Q %LIBRARY_PREFIX%\bin\libiomp5md.dll
 :: del /F /Q %LIBRARY_PREFIX%\lib\libiomp5md.dll
 
-if not exist "%LIBRARY_PREFIX%\lib\clang\%PKG_VERSION%\include\" (
-  mkdir "%LIBRARY_PREFIX%\lib\clang
-  mkdir "%LIBRARY_PREFIX%\lib\clang\%PKG_VERSION%
-  mkdir "%LIBRARY_PREFIX%\lib\clang\%PKG_VERSION%\include"
-)
-
-if not exist "%LIBRARY_PREFIX%\lib\clang\%PKG_VERSION%\include\" (
-  exit 1
-)
+if not exist "%LIBRARY_PREFIX%\lib\clang\%PKG_VERSION%\include\" mkdir "%LIBRARY_PREFIX%\lib\clang\%PKG_VERSION%\include"
+if %ERRORLEVEL% neq 0 exit 1
 
 :: Standalone libomp build doesn't put omp.h in clang's default search path
-copy /b %LIBRARY_INC%\omp.h %LIBRARY_PREFIX%\lib\clang\%PKG_VERSION%\include
-exit 0
+cp %LIBRARY_PREFIX%\include\omp.h %LIBRARY_PREFIX%\lib\clang\%PKG_VERSION%\include
+if %ERRORLEVEL% neq 0 exit 1
