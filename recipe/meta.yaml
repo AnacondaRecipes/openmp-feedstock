@@ -76,6 +76,15 @@ about:
   doc_url: https://llvm.org/docs/
   license_family: Apache
   summary: The OpenMP API supports multi-platform shared-memory parallel programming in C/C++ and Fortran.
+  description: |
+    LLVM's OpenMP runtime library (libomp) provides a high-performance implementation
+    of the OpenMP API specification for shared-memory parallel programming. This
+    package delivers the runtime library and headers needed to execute OpenMP programs
+    compiled with clang or other LLVM-based compilers. It supports all major OpenMP
+    features including parallel regions, work-sharing constructs, synchronization
+    primitives, and SIMD directives. The implementation is optimized for modern
+    multi-core processors and provides excellent scalability across different
+    platforms including Linux, macOS, and Windows.
   dev_url: https://github.com/llvm/llvm-project/
 
 extra:
