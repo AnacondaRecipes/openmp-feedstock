@@ -41,8 +41,12 @@ outputs:
         - perl
       host:
         - llvmdev {{ version }}|{{ version }}.*
-        - zlib   # [linux]
-        - zstd   # [linux]
+        - compiler-rt {{ version }}  # [osx]
+        - zlib {{ zlib }}  # [linux]
+        - zstd {{ zstd }}  # [linux]
+        - libffi {{ libffi }}  # [linux]
+      run:
+        - libffi  # [linux]
       run_constrained:
         - openmp {{ version }}|{{ version }}.*
     test:
