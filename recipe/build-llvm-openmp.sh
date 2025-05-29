@@ -21,6 +21,16 @@ cd build
 if [[ "${target_platform}" == osx-* ]]; then
   # See https://github.com/AnacondaRecipes/aggregate/issues/107
   export CPPFLAGS="-mmacosx-version-min=${MACOSX_DEPLOYMENT_TARGET} -isystem ${PREFIX}/include -D_FORTIFY_SOURCE=2"
+  
+  # Force-load compiler-rt builtins to provide complex arithmetic runtime functions
+  # (__divdc3, __divsc3) needed by OpenMP atomic operations on macOS.
+  # Without this, linking fails with "Undefined symbols" errors on arm64.
+  if [[ "${target_platform}" == osx-64 ]]; then
+    BUILTIN_RT="${PREFIX}/lib/clang/17/lib/libclang_rt.builtins_x86_64_osx.a"
+  elif [[ "${target_platform}" == osx-arm64 ]]; then
+    BUILTIN_RT="${PREFIX}/lib/clang/17/lib/libclang_rt.builtins_arm64_osx.a"
+  fi
+  export LDFLAGS="${LDFLAGS} -Wl,-force_load,${BUILTIN_RT}"
 fi
 
 if [[ "${target_platform}" == "linux"* ]]; then
