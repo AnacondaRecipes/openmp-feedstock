@@ -25,10 +25,11 @@ if [[ "${target_platform}" == osx-* ]]; then
   # Force-load compiler-rt builtins to provide complex arithmetic runtime functions
   # (__divdc3, __divsc3) needed by OpenMP atomic operations on macOS.
   # Without this, linking fails with "Undefined symbols" errors on arm64.
+  LLVM_MAJOR_VERSION="${PKG_VERSION%%.*}"
   if [[ "${target_platform}" == osx-64 ]]; then
-    BUILTIN_RT="${PREFIX}/lib/clang/17/lib/libclang_rt.builtins_x86_64_osx.a"
+    BUILTIN_RT="${PREFIX}/lib/clang/${LLVM_MAJOR_VERSION}/lib/libclang_rt.builtins_x86_64_osx.a"
   elif [[ "${target_platform}" == osx-arm64 ]]; then
-    BUILTIN_RT="${PREFIX}/lib/clang/17/lib/libclang_rt.builtins_arm64_osx.a"
+    BUILTIN_RT="${PREFIX}/lib/clang/${LLVM_MAJOR_VERSION}/lib/libclang_rt.builtins_arm64_osx.a"
   fi
   export LDFLAGS="${LDFLAGS} -Wl,-force_load,${BUILTIN_RT}"
 fi
