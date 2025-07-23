@@ -42,6 +42,7 @@ requirements:
     - llvmdev {{ version }}
     # see https://github.com/llvm/llvm-project/issues/54596
     - compiler-rt {{ version }}  # [osx and arm64]
+    - zstd                       # [osx and x86_64]
 
 outputs:
   - name: llvm-openmp
