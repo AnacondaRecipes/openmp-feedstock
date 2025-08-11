@@ -34,8 +34,6 @@ requirements:
     - {{ compiler("cxx") }}
     - {{ compiler("fortran") }}  # [win]
     - clang                      # [win]
-    - msys2-patch                # [win]
-    - patch                      # [unix]
     - cmake
     - ninja
   host:
