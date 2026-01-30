@@ -27,6 +27,8 @@ source:
 
 build:
   number: 0
+  # TODO: Windows build requires flang 21.1.8 which is not yet released
+  skip: true  # [win]
 
 requirements:
   build:
