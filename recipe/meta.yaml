@@ -59,6 +59,8 @@ outputs:
       build:
         # cmake on osx causes circular dependency (cmake depends on llvm-openmp)
         - cmake  # [not osx]
+        # ninja needed for install on osx where cmake is not available
+        - ninja  # [osx]
         # for run-exports
         - {{ stdlib("c") }}
         - {{ compiler("cxx") }}
