@@ -3,12 +3,13 @@ set -ex
 
 cd openmp/build
 
-# Use BUILD_PREFIX cmake if cmake not in PATH (e.g., on osx where cmake
-# is removed from output requirements to avoid circular dependency)
+# On osx, cmake is removed from output requirements to avoid circular dependency.
+# Use ninja install directly since build uses Ninja generator.
 if command -v cmake &> /dev/null; then
   cmake --install .
 else
-  $BUILD_PREFIX/bin/cmake --install .
+  # ninja should be available from main build requirements
+  ninja install
 fi
 
 rm -f $PREFIX/lib/libgomp$SHLIB_EXT
