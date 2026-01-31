@@ -27,8 +27,6 @@ source:
 
 build:
   number: 0
-  # TODO: Windows build requires flang 21.1.8 which is not yet released
-  skip: true  # [win]
 
 requirements:
   build:
@@ -59,7 +57,8 @@ outputs:
           - _openmp_mutex * *_llvm            # [linux]
     requirements:
       build:
-        - cmake
+        # cmake on osx causes circular dependency (cmake depends on llvm-openmp)
+        - cmake  # [not osx]
         # for run-exports
         - {{ stdlib("c") }}
         - {{ compiler("cxx") }}

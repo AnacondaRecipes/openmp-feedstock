@@ -1,3 +1,10 @@
 build_parameters:
   - "--suppress-variables"
   - "--error-overlinking"
+
+# Upload to staging for bootstrap builds
+staging_channel_upload_target: llvm-21.1.8-stage2-build-0
+
+# Use staging channel for flang 21.1.8 (Windows build dependency)
+channels:
+  - https://staging.continuum.io/pbp/llvm-21.1.8-stage2-build-0
