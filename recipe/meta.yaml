@@ -50,6 +50,7 @@ outputs:
       ignore_run_exports_from:
         - {{ compiler("cxx") }}
         - {{ compiler("fortran") }}
+        - llvmdev
       run_exports:
         strong:
           - {{ pin_subpackage("llvm-openmp", max_pin=None) }}
