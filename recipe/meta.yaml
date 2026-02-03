@@ -109,6 +109,9 @@ outputs:
     build:
       # restricted to windows for now
       skip: true  # [not win]
+      ignore_run_exports_from:
+        - {{ compiler("cxx") }}
+        - {{ compiler("fortran") }}
       run_exports:
         strong:
           - {{ pin_subpackage("llvm-openmp", max_pin=None) }}
