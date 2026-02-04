@@ -58,7 +58,7 @@ outputs:
           - _openmp_mutex * *_llvm            # [linux]
     requirements:
       build:
-        - cmake
+        - cmake  # [not osx]
         - ninja  # [osx]
         # for run-exports
         - {{ stdlib("c") }}

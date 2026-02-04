@@ -3,9 +3,10 @@ set -ex
 
 cd openmp/build
 
-# On osx, cmake is removed from output requirements to avoid circular dependency.
-# Use ninja install directly since build uses Ninja generator.
-if command -v cmake &> /dev/null; then
+# Use build-prefix cmake on osx to avoid output-dep cycles.
+if [[ -x "$BUILD_PREFIX/bin/cmake" ]]; then
+  "$BUILD_PREFIX/bin/cmake" --install .
+elif command -v cmake &> /dev/null; then
   cmake --install .
 else
   # ninja should be available from main build requirements
