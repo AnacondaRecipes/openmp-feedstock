@@ -55,7 +55,3 @@ cmake -G Ninja \
     ..
 
 cmake --build .
-
-if [[ "${target_platform}" == osx-* ]]; then
-  cmake --install .
-fi

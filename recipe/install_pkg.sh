@@ -3,14 +3,16 @@ set -ex
 
 cd openmp/build
 
-# Install on osx is done during build to avoid output cmake deps.
-if [[ "$target_platform" != osx-* ]]; then
+if [[ "$target_platform" == osx-* ]]; then
+  # cmake is not in output build requirements on osx (circular dep issue),
+  # but it exists in BUILD_PREFIX from top-level build requirements
+  "$BUILD_PREFIX/bin/cmake" --install .
+else
   if [[ -x "$BUILD_PREFIX/bin/cmake" ]]; then
     "$BUILD_PREFIX/bin/cmake" --install .
   elif command -v cmake &> /dev/null; then
     cmake --install .
   else
-    # ninja should be available from main build requirements
     ninja install
   fi
 fi
