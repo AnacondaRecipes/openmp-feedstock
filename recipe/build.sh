@@ -55,3 +55,12 @@ cmake -G Ninja \
     ..
 
 cmake --build .
+
+# On macOS, pre-stage installation while cmake is still available.
+# In the output install phase (install_pkg.sh), cmake is NOT available
+# due to circular dependency (cmake depends on llvm-openmp on macOS),
+# and ninja install also fails because it calls cmake internally.
+# So we stage to a temporary prefix here, then copy in install_pkg.sh.
+if [[ "${target_platform}" == osx-* ]]; then
+  cmake --install . --prefix $SRC_DIR/openmp/staged_install
+fi
