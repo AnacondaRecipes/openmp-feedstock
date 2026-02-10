@@ -74,33 +74,62 @@ outputs:
       files:
         - omp_hello.c
       commands:
+        # re-enable echo after vcvarsall.bat turns it off
+        - '@echo on'                                                          # [win]
+        - echo "=== [DEBUG] llvm-openmp test starting ==="                    # [win]
+        - echo "=== [DEBUG] LIBRARY_INC=%LIBRARY_INC% ==="                   # [win]
+        - echo "=== [DEBUG] LIBRARY_LIB=%LIBRARY_LIB% ==="                   # [win]
+        - echo "=== [DEBUG] LIBRARY_BIN=%LIBRARY_BIN% ==="                   # [win]
+        - echo "=== [DEBUG] cd=%cd% ==="                                      # [win]
+        - dir "%LIBRARY_INC%\omp*.h" 2>nul || echo "[DEBUG] No omp*.h in LIBRARY_INC"    # [win]
+        - dir "%LIBRARY_BIN%\libomp*" 2>nul || echo "[DEBUG] No libomp* in LIBRARY_BIN"  # [win]
+        - dir "%LIBRARY_LIB%\libomp*" 2>nul || echo "[DEBUG] No libomp* in LIBRARY_LIB"  # [win]
+        - dir "%LIBRARY_LIB%\clang\" 2>nul || echo "[DEBUG] No clang\ dir in LIBRARY_LIB"  # [win]
+        - dir omp_hello.c 2>nul || echo "[DEBUG] omp_hello.c NOT in current dir"         # [win]
+        - where clang 2>nul || echo "[DEBUG] clang not on PATH"                           # [win]
+        - where clang-cl 2>nul || echo "[DEBUG] clang-cl not on PATH"                     # [win]
+
         # headers
         - test -f $PREFIX/include/omp.h                   # [unix]
+        - echo "=== [DEBUG] Checking omp.h ==="                               # [win]
         - if not exist %LIBRARY_INC%\omp.h exit 1         # [win]
+        - echo "=== [DEBUG] omp.h OK ==="                                     # [win]
         # clang-specific one (symlink on unix; copies on win, see install_pkg.bat)
         - test -f $PREFIX/lib/clang/{{ clang_major }}/include/omp.h         # [unix]
         {% for ver in range(18, clang_major + 1) %}
+        - echo "=== [DEBUG] Checking clang\{{ ver }}\include\omp.h ==="      # [win]
         - if not exist %LIBRARY_LIB%\clang\{{ ver }}\include\omp.h exit 1   # [win]
         {% endfor %}
+        - echo "=== [DEBUG] All clang version omp.h checks OK ==="           # [win]
 
         # absence of fortran bits
         - test ! -f $PREFIX/include/omp_lib.mod             # [linux]
         - test ! -f $PREFIX/include/omp_lib_kinds.mod       # [linux]
+        - echo "=== [DEBUG] Checking fortran modules absent ==="              # [win]
         - if exist %LIBRARY_INC%\omp_lib.mod exit 1         # [win]
         - if exist %LIBRARY_INC%\omp_lib_kinds.mod exit 1   # [win]
+        - echo "=== [DEBUG] Fortran module absence checks OK ==="             # [win]
 
         # shared library
         - test -f $PREFIX/lib/libomp.so                   # [linux]
         - test -f $PREFIX/lib/libomp.dylib                # [osx]
+        - echo "=== [DEBUG] Checking libomp.dll ==="                          # [win]
         - if not exist %LIBRARY_BIN%\libomp.dll exit 1    # [win]
+        - echo "=== [DEBUG] Checking libomp.lib ==="                          # [win]
         - if not exist %LIBRARY_LIB%\libomp.lib exit 1    # [win]
+        - echo "=== [DEBUG] Shared library checks OK ==="                     # [win]
 
         # compilation test
         - export LNK_XTRA="-Wl,--allow-shlib-undefined"   # [linux]
         - $PREFIX/bin/clang -v -fopenmp -I$PREFIX/include -L$PREFIX/lib -Wl,-rpath,$PREFIX/lib $LNK_XTRA omp_hello.c -o omp_hello  # [unix]
+        - echo "=== [DEBUG] Compiling omp_hello.c with clang ==="             # [win]
+        - echo "=== [DEBUG] Using %LIBRARY_BIN%\clang ==="                    # [win]
         - '%LIBRARY_BIN%\clang -v -fopenmp -I%LIBRARY_INC% -L%LIBRARY_LIB% omp_hello.c -o omp_hello.exe'   # [win]
+        - echo "=== [DEBUG] Compilation succeeded, running omp_hello.exe ===" # [win]
+        - dir omp_hello.exe 2>nul || echo "[DEBUG] omp_hello.exe NOT found after compilation"  # [win]
         - ./omp_hello            # [unix]
         - '%cd%\omp_hello.exe'   # [win]
+        - echo "=== [DEBUG] llvm-openmp test PASSED ==="                      # [win]
 
   - name: llvm-openmp-fortran
     script: install_pkg.sh   # [unix]
