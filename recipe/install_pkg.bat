@@ -16,7 +16,7 @@ if %ERRORLEVEL% neq 0 exit 1
 :: https://github.com/conda-forge/clangdev-feedstock/pull/345 is not backported further.
 for /L %%I in (18,1,%PKG_VERSION:~0,2%) do (
     if not exist "%LIBRARY_LIB%\clang\%%I\include\" mkdir "%LIBRARY_LIB%\clang\%%I\include"
-    cp %LIBRARY_INC%\omp.h %LIBRARY_LIB%\clang\%%I\include
+    copy "%LIBRARY_INC%\omp.h" "%LIBRARY_LIB%\clang\%%I\include\omp.h" >nul
     if %ERRORLEVEL% neq 0 exit 1
 )
 
