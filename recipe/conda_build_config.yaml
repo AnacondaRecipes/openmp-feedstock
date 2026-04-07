@@ -1,17 +1,22 @@
 fortran_compiler:          # [win]
   - flang                  # [win]
+# NOTE: flang pin stays at 21.1.8 on Windows until flang 22 (Tier 3)
+# is built. openmp's Fortran module files (omp_lib.mod,
+# omp_lib_kinds.mod) are stable across LLVM versions, so flang 21
+# can build openmp 22 Fortran bits as an interim. Bump this to
+# 22.1.2 after flang 22 lands in pkgs/main.
 fortran_compiler_version:  # [win]
   - 21.1.8                 # [win]
 
 c_compiler:          # [osx]
   - clang_bootstrap  # [osx]
-cxx_compiler:        # [osx]    
+cxx_compiler:        # [osx]
   - clang_bootstrap  # [osx]
 
 c_compiler_version:    # [osx]
-  - 21.1.8             # [osx]
+  - 22.1.2             # [osx]
 cxx_compiler_version:  # [osx]
-  - 21.1.8             # [osx]
+  - 22.1.2             # [osx]
 
 # Keep consistent with llvmdev and clangdev
 c_compiler:        # [win]
