@@ -24,6 +24,9 @@ source:
     # fix for https://github.com/llvm/llvm-project/issues/54596
     - patches/0001-link-libomp-to-compiler-rt-on-osx-arm.patch
     - patches/0002-win-fix-link-flags.patch  # [win]
+    # LLVM 22 regression: openmp/module/CMakeLists.txt:60 references
+    # runtime/src directory before CMake has processed it.
+    - patches/0003-fix-module-set-property-runtime-src.patch  # [win]
 
 build:
   number: 0
@@ -47,6 +50,20 @@ outputs:
     script: install_pkg.sh   # [unix]
     script: install_pkg.bat  # [win]
     build:
+      # Each ignore below is justified by what libomp.{so,dylib,dll} actually
+      # links against (verified via conda-build's overlinking detection):
+      #   - cxx_compiler: libgcc/libstdc++ are statically linked into libomp on
+      #     linux via -static-libgcc -static-libstdc++ (see build.sh `LDFLAGS`).
+      #     Without this ignore, the cxx run_exports (libgcc-ng, libstdcxx-ng)
+      #     would be added as run deps despite not being linked.
+      #   - fortran_compiler: only present in build env on Windows. The cxx
+      #     output (libomp.dll) does not consume Fortran modules — those live
+      #     in the separate llvm-openmp-fortran output. flang's run_exports
+      #     (libflang-rt, etc.) would be over-depending here.
+      #   - llvmdev: openmp uses llvmdev only for cmake config + headers and
+      #     explicitly disables LLVM_LINK_LLVM_DYLIB on linux (see build.sh
+      #     sed). libomp.so does not link libLLVM.so, so llvmdev's strong
+      #     run_export (libllvm<MAJOR>, ~100MB) would be wrong to inject.
       ignore_run_exports_from:
         - {{ compiler("cxx") }}
         - {{ compiler("fortran") }}
@@ -109,7 +126,12 @@ outputs:
     build:
       # restricted to windows for now
       skip: true  # [not win]
-      # prevent compilers from injecting runtime deps into this module package
+      # This output ships ONLY the Fortran module files (omp_lib.mod,
+      # omp_lib_kinds.mod) — no compiled binaries — so neither the C++
+      # runtime (cxx_compiler run_exports: vc14_runtime, ucrt) nor the
+      # flang runtime (fortran_compiler run_exports) are needed at run
+      # time. Both ignores are over-depending suppressions, not ABI
+      # workarounds.
       ignore_run_exports_from:
         - {{ compiler("cxx") }}
         - {{ compiler("fortran") }}
