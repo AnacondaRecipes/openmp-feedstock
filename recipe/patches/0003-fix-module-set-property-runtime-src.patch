@@ -1,0 +1,43 @@
+From d1f099fb3e21674574f1e5eb3e8ec8b236ca5616 Mon Sep 17 00:00:00 2001
+From: Xianglong Kong <xkong@anaconda.com>
+Date: Wed, 8 Apr 2026 12:00:00 +0000
+Subject: [PATCH] openmp/module: drop premature set_property on runtime/src
+
+LLVM 22 refactored Fortran module generation into openmp/module/, which
+is added via add_subdirectory(module) in openmp/CMakeLists.txt BEFORE
+add_subdirectory(runtime). The set_property call below tries to attach
+an ADDITIONAL_MAKE_CLEAN_FILES property to the runtime/src binary
+directory, but at the time module/CMakeLists.txt is processed CMake
+has not yet visited runtime/src, so the call fails with:
+
+    CMake Error at module/CMakeLists.txt:60 (set_property):
+      set_property DIRECTORY scope provided but requested directory was
+      not found. This could be because the directory argument was invalid
+      or, it is valid but has not been processed yet.
+
+This fires on platforms where LIBOMP_FORTRAN_MODULES is True and
+LIBOMP_FORTRAN_MODULES_COMPILER is unset — i.e. Windows in our build
+matrix, where we use the explicit CMAKE_Fortran_COMPILER branch.
+Since the property is only a `make clean` hint for an intermediate
+omp_lib object file (and on Windows we use Ninja, not make), removing
+it has no functional impact.
+
+---
+ openmp/module/CMakeLists.txt | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/openmp/module/CMakeLists.txt b/openmp/module/CMakeLists.txt
+index 48f5b0f..478e1c9 100644
+--- a/openmp/module/CMakeLists.txt
++++ b/openmp/module/CMakeLists.txt
+@@ -57,7 +57,6 @@ elseif (LIBOMP_FORTRAN_MODULES)
+             ${LIBOMP_CONFIGURED_FFLAGS} ${LIBOMP_FORTRAN_SOURCE_FILE} "-J${CMAKE_CURRENT_BINARY_DIR}/../runtime/src"
+     DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/${LIBOMP_FORTRAN_SOURCE_FILE}"
+   )
+-  set_property(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../runtime/src" PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "omp_lib${CMAKE_C_OUTPUT_EXTENSION}")
+   set(BUILD_FORTRAN_MODULES True)
+ endif ()
+
+--
+2.50.1
+
