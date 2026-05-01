@@ -8,3 +8,4 @@ upstream_sources:
       to_pattern: \1
     packages:
       - llvm-openmp
+      - llvm-openmp-fortran
