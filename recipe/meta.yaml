@@ -71,7 +71,7 @@ outputs:
       run_exports:
         strong:
           - {{ pin_subpackage("llvm-openmp", max_pin=None) }}
-          - _openmp_mutex >=6.0 *_llvm
+          - _openmp_mutex *_llvm
     requirements:
       build:
         # cmake depends on llvm-openmp on macOS (circular dep); use ninja instead
@@ -137,7 +137,7 @@ outputs:
       run_exports:
         strong:
           - {{ pin_subpackage("llvm-openmp", max_pin=None) }}
-          - _openmp_mutex >=6.0 *_llvm
+          - _openmp_mutex *_llvm
     requirements:
       build:
         - cmake
