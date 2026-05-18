@@ -1,7 +1,4 @@
 {% set version = "22.1.2" %}
-# check https://clang.llvm.org/docs/OpenMPSupport.html
-# occasionally to see last fully supported openmp ver.
-{% set openmp_ver = "4.5" %}
 
 # on osx we need to use cxx_compiler_version, rest can use package version
 {% set clang_major = version.split(".")[0]|int %}
