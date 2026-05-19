@@ -1,7 +1,4 @@
 {% set version = "22.1.2" %}
-# check https://clang.llvm.org/docs/OpenMPSupport.html
-# occasionally to see last fully supported openmp ver.
-{% set openmp_ver = "4.5" %}
 
 # on osx we need to use cxx_compiler_version, rest can use package version
 {% set clang_major = version.split(".")[0]|int %}
@@ -29,7 +26,7 @@ source:
     - patches/0003-fix-module-set-property-runtime-src.patch  # [win]
 
 build:
-  number: 0
+  number: 1
 
 requirements:
   build:
@@ -71,8 +68,7 @@ outputs:
       run_exports:
         strong:
           - {{ pin_subpackage("llvm-openmp", max_pin=None) }}
-          - _openmp_mutex >={{ openmp_ver }}  # [linux]
-          - _openmp_mutex * *_llvm            # [linux]
+          - _openmp_mutex * *_llvm
     requirements:
       build:
         # cmake depends on llvm-openmp on macOS (circular dep); use ninja instead
@@ -138,8 +134,7 @@ outputs:
       run_exports:
         strong:
           - {{ pin_subpackage("llvm-openmp", max_pin=None) }}
-          - _openmp_mutex >={{ openmp_ver }}  # [linux]
-          - _openmp_mutex * *_llvm            # [linux]
+          - _openmp_mutex * *_llvm
     requirements:
       build:
         - cmake
