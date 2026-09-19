@@ -25,3 +25,9 @@ if "%PKG_NAME%" NEQ "llvm-openmp-fortran" (
     del /s /q %LIBRARY_INC%\omp_lib.mod
     del /s /q %LIBRARY_INC%\omp_lib_kinds.mod
 )
+
+:: PKG-18188 / anaconda-issues 13513: also ship libomp.dll under the alias name
+:: pytorch's win-64 openblas torch_cpu.dll links (libomp140.x86_64.dll) - same
+:: runtime, different filename. llvm-openmp only, not the fortran metapackage.
+:: Presence is verified by the test in meta.yaml.
+if "%PKG_NAME%" == "llvm-openmp" copy /Y "%LIBRARY_BIN%\libomp.dll" "%LIBRARY_BIN%\libomp140.x86_64.dll"

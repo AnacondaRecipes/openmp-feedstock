@@ -26,7 +26,7 @@ source:
     - patches/0003-fix-module-set-property-runtime-src.patch  # [win]
 
 build:
-  number: 1
+  number: 2
 
 requirements:
   build:
@@ -107,6 +107,8 @@ outputs:
         - test -f $PREFIX/lib/libomp.so                   # [linux]
         - test -f $PREFIX/lib/libomp.dylib                # [osx]
         - if not exist %LIBRARY_BIN%\libomp.dll exit 1    # [win]
+        # PKG-18188 / anaconda-issues 13513: libomp140.x86_64.dll alias for pytorch win-64 openblas
+        - if not exist %LIBRARY_BIN%\libomp140.x86_64.dll exit 1    # [win]
         - if not exist %LIBRARY_LIB%\libomp.lib exit 1    # [win]
 
         # compilation test
