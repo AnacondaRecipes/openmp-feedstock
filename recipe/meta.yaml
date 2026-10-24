@@ -1,4 +1,4 @@
-{% set version = "22.1.2" %}
+{% set version = "23.1.4" %}
 
 # on osx we need to use cxx_compiler_version, rest can use package version
 {% set clang_major = version.split(".")[0]|int %}
@@ -12,21 +12,14 @@ package:
 
 source:
   url: https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-{{ version.replace(".rc", "-rc") }}.tar.gz
-  sha256: a252efd7a4a268d2cc5145b17adcaa82757fdee1d06d748b4c24137807710ecb
-  # name folder for easier deletion; we do the equivalent of downloading
-  # the subproject sources, so the work folder then has openmp in it;
-  # for details see build scripts
-  folder: llvm-project
+  sha256: 3e1c70b30f623976c2046d94b8eeab6cac536f107914cb4ed7bac572a03131db
   patches:
     # fix for https://github.com/llvm/llvm-project/issues/54596
     - patches/0001-link-libomp-to-compiler-rt-on-osx-arm.patch
     - patches/0002-win-fix-link-flags.patch  # [win]
-    # LLVM 22 regression: openmp/module/CMakeLists.txt:60 references
-    # runtime/src directory before CMake has processed it.
-    - patches/0003-fix-module-set-property-runtime-src.patch  # [win]
 
 build:
-  number: 1
+  number: 0
 
 requirements:
   build:
@@ -36,6 +29,8 @@ requirements:
     - clang                      # [win]
     - cmake
     - ninja
+    # runtimes/CMakeLists.txt requires a Python 3 interpreter
+    - python
   host:
     - llvmdev {{ version }}
     # see https://github.com/llvm/llvm-project/issues/54596
@@ -102,11 +97,16 @@ outputs:
         - test ! -f $PREFIX/include/omp_lib_kinds.mod       # [linux]
         - if exist %LIBRARY_INC%\omp_lib.mod exit 1         # [win]
         - if exist %LIBRARY_INC%\omp_lib_kinds.mod exit 1   # [win]
+        - if exist %LIBRARY_LIB%\clang\{{ clang_major }}\finclude exit 1   # [win]
+        # Fortran include file, shipped here as in 22.x
+        - if not exist %LIBRARY_INC%\omp_lib.h exit 1        # [win]
 
         # shared library
         - test -f $PREFIX/lib/libomp.so                   # [linux]
         - test -f $PREFIX/lib/libomp.dylib                # [osx]
         - if not exist %LIBRARY_BIN%\libomp.dll exit 1    # [win]
+        # PKG-18188 / anaconda-issues 13513: libomp140.x86_64.dll alias for pytorch win-64 openblas
+        - if not exist %LIBRARY_BIN%\libomp140.x86_64.dll exit 1    # [win64]
         - if not exist %LIBRARY_LIB%\libomp.lib exit 1    # [win]
 
         # compilation test
@@ -149,11 +149,30 @@ outputs:
       run_constrained:  # [win]
         - {{ compiler("fortran") }}  # [win]
     test:
+      requires:
+        - {{ compiler("fortran") }}  # [win]
       commands:
         - test -f $PREFIX/include/omp_lib.mod                   # [linux]
         - test -f $PREFIX/include/omp_lib_kinds.mod             # [linux]
+        # 22.x location, on the -I path the flang activation sets
         - if not exist %LIBRARY_INC%\omp_lib.mod exit 1         # [win]
         - if not exist %LIBRARY_INC%\omp_lib_kinds.mod exit 1   # [win]
+        # LLVM 23 location: flang's own module search path
+        - if not exist %LIBRARY_LIB%\clang\{{ clang_major }}\finclude\flang\x86_64-pc-windows-msvc\omp_lib.mod exit 1        # [win64]
+        - if not exist %LIBRARY_LIB%\clang\{{ clang_major }}\finclude\flang\x86_64-pc-windows-msvc\omp_lib_kinds.mod exit 1  # [win64]
+        # compile a program using omp_lib with plain flang (no -I), i.e. found via flang's search path
+        - echo program t > t.f90                                            # [win]
+        - echo use omp_lib >> t.f90                                         # [win]
+        - echo implicit none >> t.f90                                       # [win]
+        - echo integer n >> t.f90                                           # [win]
+        - echo n = omp_get_max_threads() >> t.f90                           # [win]
+        - echo if (n .lt. 1) error stop 1 >> t.f90                          # [win]
+        - echo end program t >> t.f90                                       # [win]
+        - flang -fopenmp -c t.f90 -o t.obj                                  # [win]
+        - if not exist t.obj exit 1                                         # [win]
+        # link and run it with FFLAGS/LDFLAGS from the flang activation, as a build system would
+        - "%FC% %FFLAGS% -fopenmp t.f90 -o t.exe %LDFLAGS%"                 # [win]
+        - t.exe                                                             # [win]
 
 about:
   home: https://openmp.llvm.org/

@@ -14,10 +14,10 @@ C:\Windows\system32\cmd.exe /C "cd . && %PREFIX%\Library\bin\llvm-lib.exe /nolog
  1 file changed, 8 insertions(+)
 
 diff --git a/openmp/runtime/src/CMakeLists.txt b/openmp/runtime/src/CMakeLists.txt
-index f106694841ce..d4bd9b4e955e 100644
+index 826e2f4..5814842 100644
 --- a/openmp/runtime/src/CMakeLists.txt
 +++ b/openmp/runtime/src/CMakeLists.txt
-@@ -165,6 +165,14 @@ if(NOT WIN32)
+@@ -162,6 +162,14 @@ if(NOT WIN32)
    add_definitions(-U_GLIBCXX_ASSERTIONS)
  endif()
  
@@ -30,8 +30,9 @@ index f106694841ce..d4bd9b4e955e 100644
 +endif()
 +
  # Add the OpenMP library
- libomp_get_ldflags(LIBOMP_CONFIGURED_LDFLAGS)
  
+ # First, create an OBJECT library with all the runtime sources.
+
 -- 
 2.45.2
 

@@ -1,7 +1,7 @@
 @echo on
 setlocal enabledelayedexpansion
 
-cd openmp/build
+cd build
 
 cmake --install .
 if %ERRORLEVEL% neq 0 exit 1
@@ -20,8 +20,27 @@ for /L %%I in (18,1,%PKG_VERSION:~0,2%) do (
     if %ERRORLEVEL% neq 0 exit 1
 )
 
-:: remove fortran bits from regular llvm-openmp package
-if "%PKG_NAME%" NEQ "llvm-openmp-fortran" (
-    del /s /q %LIBRARY_INC%\omp_lib.mod
-    del /s /q %LIBRARY_INC%\omp_lib_kinds.mod
+REM LLVM 23 installs the Fortran modules and omp_lib.h into flang's own module
+REM search path, lib\clang\MAJOR\finclude\flang\TRIPLE, instead of include.
+set "MOD_DIR=%LIBRARY_LIB%\clang\%PKG_VERSION:~0,2%\finclude\flang\x86_64-pc-windows-msvc"
+if not exist "%MOD_DIR%\omp_lib.mod" exit 1
+
+if "%PKG_NAME%" == "llvm-openmp-fortran" (
+    REM also keep the 22.x location, which is on the -I path the flang activation sets
+    copy /Y "%MOD_DIR%\omp_lib.mod" "%LIBRARY_INC%\"
+    if errorlevel 1 exit 1
+    copy /Y "%MOD_DIR%\omp_lib_kinds.mod" "%LIBRARY_INC%\"
+    if errorlevel 1 exit 1
+) else (
+    REM regular llvm-openmp: no Fortran modules; keep omp_lib.h in include as in 22.x
+    copy /Y "%MOD_DIR%\omp_lib.h" "%LIBRARY_INC%\"
+    if errorlevel 1 exit 1
+    rmdir /s /q "%LIBRARY_LIB%\clang\%PKG_VERSION:~0,2%\finclude"
 )
+
+:: PKG-18188 / anaconda-issues 13513: also ship libomp.dll under the alias name
+:: pytorch's win-64 openblas torch_cpu.dll links (libomp140.x86_64.dll) - same
+:: runtime, different filename. llvm-openmp only, not the fortran metapackage.
+:: Presence is verified by the test in meta.yaml.
+if "%PKG_NAME%" == "llvm-openmp" if "%target_platform%" == "win-64" copy /Y "%LIBRARY_BIN%\libomp.dll" "%LIBRARY_BIN%\libomp140.x86_64.dll"
+if errorlevel 1 exit 1

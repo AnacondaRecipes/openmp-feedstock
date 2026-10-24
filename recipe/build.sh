@@ -1,18 +1,13 @@
 #!/bin/bash
 set -ex
 
-# using subproject sources has been effectively broken in LLVM 14,
-# so we use the entire project, but make sure we don't pick up
-# anything in-tree other than openmp & the shared cmake folder
-mv llvm-project/openmp ./openmp
-mv llvm-project/cmake ./cmake
-rm -rf llvm-project
-cd openmp
+# LLVM 23 removed the standalone openmp build; build it through the
+# runtimes directory, which needs the full llvm-project tree
 
 if [[ "${target_platform}" == "linux"* ]]; then
   # Make sure libomptarget does not link to libLLVM.so
-  find . -name CMakeLists.txt -print0 | xargs -0 sed -i 's/LLVM_LINK_LLVM_DYLIB/LLVM_LINK_LLVM_DYLIB2/g'
-  find . -name CMakeLists.txt -print0 | xargs -0 sed -i 's/NO_INSTALL_RPATH/NO_INSTALL_RPATH DISABLE_LLVM_LINK_LLVM_DYLIB/g'
+  find openmp -name CMakeLists.txt -print0 | xargs -0 sed -i 's/LLVM_LINK_LLVM_DYLIB/LLVM_LINK_LLVM_DYLIB2/g'
+  find openmp -name CMakeLists.txt -print0 | xargs -0 sed -i 's/NO_INSTALL_RPATH/NO_INSTALL_RPATH DISABLE_LLVM_LINK_LLVM_DYLIB/g'
 fi
 
 mkdir build
@@ -52,7 +47,8 @@ cmake -G Ninja \
     -DCMAKE_INSTALL_PREFIX=$PREFIX \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_PREFIX_PATH=$PREFIX \
-    ..
+    -DLLVM_ENABLE_RUNTIMES=openmp \
+    ../runtimes
 
 cmake --build .
 
@@ -62,5 +58,5 @@ cmake --build .
 # and ninja install also fails because it calls cmake internally.
 # So we stage to a temporary prefix here, then copy in install_pkg.sh.
 if [[ "${target_platform}" == osx-* ]]; then
-  cmake --install . --prefix $SRC_DIR/openmp/staged_install
+  cmake --install . --prefix $SRC_DIR/staged_install
 fi

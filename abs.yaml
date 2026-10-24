@@ -1,3 +1,13 @@
 build_parameters:
   - "--suppress-variables"
   - "--error-overlinking"
+# PR CI only - REMOVE before merge (none of these is on pkgs/main yet):
+# clang_bootstrap 23.1.4 (osx) from AnacondaRecipes/clang-compiler-activation-feedstock#29 (graph of head e4e45e7),
+# flang_win-64 23.1.4 from AnacondaRecipes/flang-activation-feedstock#6 (graph of head 5b00c83),
+# flang 23.1.4 from AnacondaRecipes/flang-feedstock#9 (graph of head bbc9dbb) and
+# flang-rt 23.1.4 from AnacondaRecipes/flang-rt-feedstock#3 (graph of head e5b9b5a)
+channels:
+  - https://package-build.internal.anaconda.com/pkg-orchestrator/v1/channels/graphs/4a9ea5f3-3e92-4125-ba0c-2451311fd67c
+  - https://package-build.internal.anaconda.com/pkg-orchestrator/v1/channels/graphs/3bbea33d-804a-4b92-baa8-11d630ac5a8b
+  - https://package-build.internal.anaconda.com/pkg-orchestrator/v1/channels/graphs/9c74a65f-0e42-4939-9417-49ea818e9e7b
+  - https://package-build.internal.anaconda.com/pkg-orchestrator/v1/channels/graphs/201941e2-fbe3-4609-ae7e-8d24ff3e08d1
