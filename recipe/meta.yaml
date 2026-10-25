@@ -107,6 +107,8 @@ outputs:
         - if not exist %LIBRARY_BIN%\libomp.dll exit 1    # [win]
         # PKG-18188 / anaconda-issues 13513: libomp140.x86_64.dll alias for pytorch win-64 openblas
         - if not exist %LIBRARY_BIN%\libomp140.x86_64.dll exit 1    # [win64]
+        # win-arm64: flang-linked Fortran OpenMP programs can import libomp140.aarch64.dll, see install_pkg.bat
+        - if not exist %LIBRARY_BIN%\libomp140.aarch64.dll exit 1   # [win and arm64]
         - if not exist %LIBRARY_LIB%\libomp.lib exit 1    # [win]
 
         # compilation test

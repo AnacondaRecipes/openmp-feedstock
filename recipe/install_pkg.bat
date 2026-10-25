@@ -46,3 +46,8 @@ if "%PKG_NAME%" == "llvm-openmp-fortran" (
 :: Presence is verified by the test in meta.yaml.
 if "%PKG_NAME%" == "llvm-openmp" if "%target_platform%" == "win-64" copy /Y "%LIBRARY_BIN%\libomp.dll" "%LIBRARY_BIN%\libomp140.x86_64.dll"
 if errorlevel 1 exit 1
+:: win-arm64: with LIB unset and Visual Studio installed, flang -fopenmp puts the VC
+:: lib path ahead of Library\lib, so it links the MSVC libomp.lib, which imports
+:: libomp140.aarch64.dll.
+if "%PKG_NAME%" == "llvm-openmp" if "%target_platform%" == "win-arm64" copy /Y "%LIBRARY_BIN%\libomp.dll" "%LIBRARY_BIN%\libomp140.aarch64.dll"
+if errorlevel 1 exit 1
