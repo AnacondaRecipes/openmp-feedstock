@@ -160,6 +160,8 @@ outputs:
         # LLVM 23 location: flang's own module search path
         - if not exist %LIBRARY_LIB%\clang\{{ clang_major }}\finclude\flang\x86_64-pc-windows-msvc\omp_lib.mod exit 1        # [win64]
         - if not exist %LIBRARY_LIB%\clang\{{ clang_major }}\finclude\flang\x86_64-pc-windows-msvc\omp_lib_kinds.mod exit 1  # [win64]
+        - if not exist %LIBRARY_LIB%\clang\{{ clang_major }}\finclude\flang\aarch64-pc-windows-msvc\omp_lib.mod exit 1        # [win and arm64]
+        - if not exist %LIBRARY_LIB%\clang\{{ clang_major }}\finclude\flang\aarch64-pc-windows-msvc\omp_lib_kinds.mod exit 1  # [win and arm64]
         # compile a program using omp_lib with plain flang (no -I), i.e. found via flang's search path
         - echo program t > t.f90                                            # [win]
         - echo use omp_lib >> t.f90                                         # [win]

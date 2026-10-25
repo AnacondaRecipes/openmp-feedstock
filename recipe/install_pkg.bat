@@ -22,7 +22,9 @@ for /L %%I in (18,1,%PKG_VERSION:~0,2%) do (
 
 REM LLVM 23 installs the Fortran modules and omp_lib.h into flang's own module
 REM search path, lib\clang\MAJOR\finclude\flang\TRIPLE, instead of include.
-set "MOD_DIR=%LIBRARY_LIB%\clang\%PKG_VERSION:~0,2%\finclude\flang\x86_64-pc-windows-msvc"
+set "OMP_TRIPLE=x86_64-pc-windows-msvc"
+if "%target_platform%" == "win-arm64" set "OMP_TRIPLE=aarch64-pc-windows-msvc"
+set "MOD_DIR=%LIBRARY_LIB%\clang\%PKG_VERSION:~0,2%\finclude\flang\%OMP_TRIPLE%"
 if not exist "%MOD_DIR%\omp_lib.mod" exit 1
 
 if "%PKG_NAME%" == "llvm-openmp-fortran" (
