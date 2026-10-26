@@ -1,11 +1,7 @@
 build_parameters:
   - "--suppress-variables"
   - "--error-overlinking"
-# PR CI only - REMOVE before merge (none of these is on pkgs/main yet):
-# flang_win-64 23.1.4 from AnacondaRecipes/flang-activation-feedstock#6 (graph of head d00c704),
-# flang 23.1.4 from AnacondaRecipes/flang-feedstock#9 (graph of head bbc9dbb) and
-# flang-rt 23.1.4 from AnacondaRecipes/flang-rt-feedstock#3 (graph of head bae3b9d)
+# PR CI only - REMOVE before merge (not on pkgs/main yet):
+# flang_win-64 23.1.4 from AnacondaRecipes/flang-activation-feedstock#6 (graph of head d00c704)
 channels:
   - https://package-build.internal.anaconda.com/pkg-orchestrator/v1/channels/graphs/50f78d55-9a05-4773-b317-e5cc3d24282e
-  - https://package-build.internal.anaconda.com/pkg-orchestrator/v1/channels/graphs/9c74a65f-0e42-4939-9417-49ea818e9e7b
-  - https://package-build.internal.anaconda.com/pkg-orchestrator/v1/channels/graphs/0a5fdfe0-799f-492e-89ec-672c859ad4e9
