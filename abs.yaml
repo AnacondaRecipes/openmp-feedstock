@@ -1,7 +1,3 @@
 build_parameters:
   - "--suppress-variables"
   - "--error-overlinking"
-# PR CI only - REMOVE before merge (not on pkgs/main yet):
-# flang_win-64 23.1.4 from AnacondaRecipes/flang-activation-feedstock#6 (graph of head d00c704)
-channels:
-  - https://package-build.internal.anaconda.com/pkg-orchestrator/v1/channels/graphs/50f78d55-9a05-4773-b317-e5cc3d24282e
