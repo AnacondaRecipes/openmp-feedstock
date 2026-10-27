@@ -1,4 +1,5 @@
 @echo on
+setlocal enabledelayedexpansion
 
 :: using subproject sources has been effectively broken in LLVM 14,
 :: so we use the entire project, but make sure we don't pick up
@@ -16,7 +17,15 @@ cd build
 set "CC=clang-cl.exe"
 set "CXX=clang-cl.exe"
 
-cmake -G "Ninja" ^
+if "%target_platform%" == "win-arm64" (
+    set "CFLAGS=%CFLAGS% --target=aarch64-pc-windows-msvc"
+    set "CXXFLAGS=%CXXFLAGS% --target=aarch64-pc-windows-msvc"
+    for /f "delims=" %%I in ('where armasm64.exe') do (
+        set "ASM_MASM=%%I"
+    )
+)
+
+cmake -G "Ninja" !CMAKE_ARGS! ^
     -DCMAKE_BUILD_TYPE="Release" ^
     -DCMAKE_TRY_COMPILE_CONFIGURATION=Release ^
     -DCMAKE_PREFIX_PATH=%LIBRARY_PREFIX% ^
